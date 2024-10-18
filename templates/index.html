@@ -1,0 +1,47 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Py-Chat</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/socket.io/4.0.0/socket.io.js"></script>
+</head>
+<body>
+    <div class="chat-container">
+        <div class="header">
+            <h2>Py-Chat</h2>
+            <p id="chat-id">Your Chat ID: </p> <!-- Menampilkan ID Chat -->
+        </div>
+        <div class="chat-window" id="chat-window"></div>
+        <input type="text" id="message" placeholder="Ketik pesan...">
+        <button onclick="sendMessage()">Kirim</button>
+    </div>
+
+    <script>
+        const socket = io();
+        let chatId = null;
+
+        // Mendapatkan Chat ID dari server
+        socket.on('chat_id', function(id) {
+            chatId = id;
+            document.getElementById('chat-id').innerText = 'Your Chat ID: ' + id;
+        });
+
+        // Mendengarkan pesan dari server dan menambahkannya ke chat window
+        socket.on('message', function(msg) {
+            let chatWindow = document.getElementById('chat-window');
+            let messageElement = document.createElement('p');
+            messageElement.innerText = msg;
+            chatWindow.appendChild(messageElement);
+        });
+
+        // Fungsi untuk mengirim pesan
+        function sendMessage() {
+            const message = document.getElementById('message').value;
+            socket.send(message);
+            document.getElementById('message').value = '';  // Hapus input setelah kirim
+        }
+    </script>
+</body>
+</html>
